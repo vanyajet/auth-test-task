@@ -38,11 +38,15 @@ const ContactsPage:React.FC = () => {
 
   const {store} = React.useContext(Context)
 
+  let history = useHistory();
+
+  if (!store.isAuth) {
+    const redirect = history.push('/signin')
+  }
+
   React.useEffect(() => {
         store.fetchUsers()
     }, [])
-
-  let history = useHistory();
 
   const handleSignOut = async () => {
       const signin = await store.signout()
