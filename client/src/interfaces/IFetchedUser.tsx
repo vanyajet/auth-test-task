@@ -21,5 +21,4 @@ export interface IFetchedUser {
         bs: string;
 
     }
-
 }

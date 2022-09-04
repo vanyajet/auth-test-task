@@ -40,6 +40,7 @@ const SignUp:FC = () => {
                 :
                 <Box 
                     component="form"
+                    onKeyDown={(e:React.KeyboardEvent<HTMLFormElement>) => e.key === 'Enter' && handleSignUp()}
                     sx={{
                         display:'flex',
                         justifyContent: 'center',

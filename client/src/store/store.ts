@@ -100,8 +100,4 @@ export default class Store {
         this.setUsers(usersResult.data);
     }
 
-    deleteUser(id:number) {
-        this.fetchedUsers = this.fetchedUsers.filter(item => item.id !== id)
-    }
-
 }

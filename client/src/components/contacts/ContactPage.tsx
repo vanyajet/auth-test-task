@@ -16,6 +16,10 @@ import { Context } from '../..';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import SearchIcon from '@mui/icons-material/Search';
+import { IFetchedUser } from '../../interfaces/IFetchedUser';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
+
 
 const Main = styled('main')(({ theme }) => ({
   flexGrow: 1,
@@ -45,8 +49,8 @@ const ContactsPage:React.FC = () => {
   }
 
   React.useEffect(() => {
-        store.fetchUsers()
-    }, [])
+    store.fetchUsers()
+  }, [])
 
   const handleSignOut = async () => {
       const signin = await store.signout()
@@ -57,11 +61,69 @@ const ContactsPage:React.FC = () => {
 
   const [searchValue, setSearchValue] = React.useState('')
 
-  const sortedUsers = store.fetchedUsers.filter(user => {
+  const [userInfo, setUserInfo] = React.useState(store.fetchedUsers)
+
+  const handleChange = (selector:string, id:number, value: string) => {
+    setUserInfo(prevState => {
+      return prevState.map(item => {
+        if (item.id === id) {
+          if (selector === 'name') {
+            item.name = value
+            return item
+          } else if (selector === 'phone') {
+            item.phone = value
+            return item
+          } else if (selector === 'companyName') {
+            item.company.name = value
+            return item
+          } else {
+            item.company.catchPhrase = value
+            return item
+          }
+        } else {
+          return item
+        }
+      })
+    })
+  }
+
+  const handleDelete = (id:number) => {
+    setUserInfo(prevState => prevState.filter((item:IFetchedUser) => item.id !== id))
+  }
+
+  const handleAdd = () => {
+    setUserInfo(prevState => {return [
+      ...prevState,
+      {
+        id: prevState.length+1,
+        name: '',
+        username: '',
+        email: '',
+        address: {
+            street: '',
+            suite: '',
+            city: '',
+            zipcode: '',
+            geo: {
+                lat: '',
+                lng: '',
+            }
+        },
+        phone: '',
+        website: '',
+        company: {
+            name: '',
+            catchPhrase: '',
+            bs: '',
+    
+        }
+    }
+    ]})
+  }
+
+  const sortedUsers = userInfo.filter(user => {
     return user.name.toLowerCase().includes(searchValue.toLowerCase())
   })
-
-
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -95,7 +157,7 @@ const ContactsPage:React.FC = () => {
             sx={{marginTop:'1rem'}}
         />
         </div>
-        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+        <List sx={{ width: '100%', bgcolor: 'background.paper', display: 'flex', flexDirection: 'column' }}>
         {sortedUsers.map(item => {
             return (
             <ListItem 
@@ -107,36 +169,60 @@ const ContactsPage:React.FC = () => {
                 }}>
                 <>
                 <ListItemAvatar>
-                <Avatar alt={item.name}>{item.username.split('')[0]}</Avatar>
+                <Avatar alt={item.name}>{item.name.split('')[0]}</Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                primary={item.name}
+                primary={
+                  <TextField 
+                    id="outlined-basic"
+                    value={item.name} 
+                    label="Name"
+                    variant="outlined"
+                    sx={{
+                      marginBottom:'1rem'
+                    }}
+                    onChange={(e) => {
+                    handleChange('name', item.id, e.target.value)
+                  }}
+                  />}
                 secondary={
                     <React.Fragment>
-                    <Typography
-                        sx={{ display: 'block' }}
-                        component="span"
-                        variant="body2"
-                        color="text.primary"
-                    >
-                        {item.phone}
-                    </Typography>
-                    <Typography
-                        sx={{ display: 'inline' }}
-                        component="span"
-                        variant="body2"
-                        color="text.primary"
-                    >
-                        {item.company.name}
-                    </Typography>
-                    {` — ${item.company.catchPhrase}`}
+                    <TextField 
+                      id="standard-basic"
+                      value={item.phone} 
+                      label="Phone"
+                      variant="standard"
+                      sx={{
+                        marginRight:'1rem'
+                      }}
+                      onChange={(e) => {
+                        handleChange('phone', item.id, e.target.value)
+                      }}
+                      />
+                    <TextField 
+                      id="standard-basic"
+                      value={item.company.name} 
+                      label="Company name"
+                      variant="standard"
+                      sx={{
+                        marginRight:'1rem'
+                      }}
+                      onChange={(e) => handleChange('companyName', item.id, e.target.value)}
+                      />
+                    <TextField 
+                      id="standard-basic"
+                      value={item.company.catchPhrase} 
+                      label="Company catch phrase"
+                      variant="standard"
+                      onChange={(e) => handleChange('companyCatchPhrase', item.id, e.target.value)}
+                      />
                     </React.Fragment>
                 }
                 />
                 </>
                 <Button
-                    color='error'
-                    onClick={() => store.deleteUser(item.id)}
+                  color='error'
+                  onClick={() => handleDelete(item.id)}
                 >
                     <DeleteIcon />
                 </Button>
@@ -144,7 +230,16 @@ const ContactsPage:React.FC = () => {
             
             )
         })}
-      
+        <Button
+            endIcon={<AddCircleOutlineIcon />}
+            color='info'
+            variant='contained'
+            size='large'
+            onClick={handleAdd}
+            sx={{ margin: '1rem', fontSize: '2rem'}}
+        >
+            Add new user
+        </Button>
         </List>
       </Main>
     </Box>

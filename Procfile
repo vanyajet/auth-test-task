@@ -1,1 +1,1 @@
-web: cd server && node run dev
+web: cd server && npm i && cd .. && cd client && npm i && cd server && node run dev

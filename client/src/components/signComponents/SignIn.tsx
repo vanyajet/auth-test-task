@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, KeyboardEventHandler } from 'react'
 import SignInBG from '../animations/SignInBG'
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { Context } from '../..';
@@ -54,6 +54,7 @@ const SignIn = () => {
                 :
                 <Box 
                     component="form"
+                    onKeyDown={(e:React.KeyboardEvent<HTMLFormElement>) => e.key === 'Enter' && handleSignIn()}
                     sx={{
                         display:'flex',
                         justifyContent: 'center',
